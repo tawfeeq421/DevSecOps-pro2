@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reddit-deployment
+  namespace: reddit
+  labels:
+    app: reddit
+    auther: Tawfeeq
+spec:
+  replicas: 2
+  strategy:
+    type: RpllingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: reddit-app
+  template:
+    metadata:
+      labels:
+        app: reddit-app
+    spec:
+      containers:
+        - name: myreddit
+          image: tawfeeq421/reddit:1
+          ports:
+            - name: reddit-port
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: 150m
+              memory: 120Mi
+            limits:
+              cpu: 250m
+              memory: 240Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 2
